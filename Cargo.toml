@@ -1,5 +1,5 @@
 [package]
-name = "Structures"
+name = "structures"
 version = "0.1.0"
 authors = ["Rusty Lock Free"]
 categories = []
