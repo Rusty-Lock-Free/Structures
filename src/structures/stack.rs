@@ -19,17 +19,17 @@ impl Stack {
 
     fn push(&self, value: i32) {
         // Allocate and initialize new node to push onto the stack
-        let new: *mut Node = Box::into_raw(Box::new(Node {
+        let mut new_box: Box<Node> = Box::new(Node {
             value,
             next: ptr::null(),
-        }));
+        });
 
         loop {
             // Acquire ensures visibility of all writes that happened-before the successful publication of this head pointer.
-            let old: *mut Node = self.head.load(std::sync::atomic::Ordering::Acquire);
-            unsafe {
-                (*new).next = old;
-            };
+            let old: *mut Node = self.head.load(Ordering::Acquire);
+            new_box.next = old;
+
+            let new_ptr = Box::into_raw(new_box); //convert new_box into a raw pointer for CAS
 
             // Release on success to publish the update to other threads, Relaxed on failure because no synchronization required.
             if self
