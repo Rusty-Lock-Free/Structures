@@ -65,7 +65,7 @@ impl Debug for Stack {
         stack_values.push(']');
 
         f.debug_struct("Stack")
-            .field("head", &stack_values)
+            .field("stack_values", &stack_values)
             .finish()
     }
 }
