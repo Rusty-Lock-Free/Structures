@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::sync::atomic::{AtomicPtr, Ordering};
 use std::{mem, ptr};
 
@@ -47,4 +48,39 @@ impl Stack {
     // fn pop(& self) -> Option<is32> {
     //Box::new(x) allocates space for x on the heap, moves x into that space, and returns an owning pointer (Box<T>) to it.
     // }
+}
+
+impl Debug for Stack {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut stack_values = String::new();
+        stack_values.push('[');
+        let mut curr: *const Node = self.head.load(Ordering::Acquire);
+        while !curr.is_null() {
+            unsafe {
+                stack_values.push_str(&format!("{} -> ", (*curr).value));
+                curr = (*curr).next
+            };
+        }
+        stack_values.push_str("None");
+        stack_values.push(']');
+
+        f.debug_struct("Stack")
+            .field("head", &stack_values)
+            .finish()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn simple_display() {
+        let stack = Stack::new();
+        for i in 1..=5 {
+            stack.push(i);
+            dbg!(&stack);
+        }
+        panic!()
+    }
 }
